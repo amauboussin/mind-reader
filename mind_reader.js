@@ -1,5 +1,5 @@
 
-//tracking variables
+//tracking variables used to push to google analytics every 5 guesses
 var submitted_guesses = 0;
 var this_five_wins = 0;
 var round_n = 1;
@@ -14,6 +14,8 @@ var computer_wins = 0;
 var player_wins = 0;
     
 var history = "";
+
+
 
 
 $("#reset-button").on("click", function(){
@@ -49,27 +51,25 @@ document.addEventListener('keydown', function(event) {
 function occurrences(string, subString, allowOverlapping){
 
     string+=""; subString+="";
-    if(subString.length<=0) return string.length+1;
+    if(subString.length<=0) 
+        return string.length+1;
 
     var n=0, pos=0;
     var step=(allowOverlapping)?(1):(subString.length);
 
     while(true){
-        pos=string.indexOf(subString,pos);
-        if(pos>=0){ n++; pos+=step; } else break;
+        pos = string.indexOf(subString,pos);
+        if(pos>=0){
+            n++; pos+=step; } 
+        else break;
     }
     return(n);
 }
 
 
-//function that determines how many votes a pattern of length x is worth
+//function that determines how many votes a pattern of length n is worth : -.4 * (n-3)^2
 function get_votes(n){
-    //parabolic function
-    //return -.4*Math.pow((x-3),2)+5;
-    //gaussian function
-    e = 2.71828
-    power = -(  Math.pow((n-4.0),2.0) / (2.0*Math.pow(2.0,2.0)) )
-    return Math.pow(e,power);
+    return -.4*Math.pow((n-3),2)+5;
 }
 
 function submitGuess (guess){
@@ -78,11 +78,11 @@ function submitGuess (guess){
     var votes_0 = 0;
     var votes_1 = 0;
     
-    for (n=min_buffer_size-1; n<max_buffer_size; n++)
+    for (n = min_buffer_size-1; n < max_buffer_size; n++)
     {
         //get the last n characters that occurred
         var last_n = ""
-        if (n!=0){
+        if (n != 0){
             last_n = history.slice(history.length-n, history.length);
         }
 
@@ -90,12 +90,12 @@ function submitGuess (guess){
         var zero = occurrences(history, last_n+"0", true);
         var one = occurrences(history, last_n+"1", true);
 
-        if (zero > one){
-            votes_0+=zero/(zero+one)*get_votes(n);}
-        if (one>zero){
-            votes_1+=one/(zero+one)*get_votes(n);}
+        if (zero > one){votes_0+=zero/(zero+one)*get_votes(n);}
+        if (one>zero){votes_1+=one/(zero+one)*get_votes(n);}
     }
     var prediction;
+
+    //check votes and finalize prediction
     if (votes_0 > votes_1){
         prediction = 0;}
     else if (votes_1 > votes_0){
@@ -107,19 +107,20 @@ function submitGuess (guess){
     //now that the prediction is all set, time to look at the guess and see if the program was right
 
     //update progress bar and counts for winner
-    if (prediction==guess){
+    if (prediction == guess){
         computer_wins++;
         this_five_wins++;
-        document.getElementById('c-progress').innerHTML = "<div class=\"bar\" style=\"width: "+computer_wins*100/threshold+"%;\"></div>";
+        $('#c-progress .bar').css("width", computer_wins*100.0/threshold+"%");
     }
     else {
         player_wins++;
-        document.getElementById('p-progress').innerHTML = "<div class=\"bar\" style=\"width: "+player_wins*100/threshold+"%;\"></div>";
+        $('#p-progress .bar').css("width", player_wins*100.0/threshold+"%");
     }
 
     history += guess.toString(); //add to the history
 
 
+    // push to google analytics every 5 guesses
     if (submitted_guesses != 0 &&  submitted_guesses % 5 == 0)
     {
         _gaq.push(['_trackEvent', 'Mind Reader Results', 'Round '+round_n, (history.slice(-5)), this_five_wins]);
@@ -143,12 +144,12 @@ function gameover(computer_won){
     $('#game-results').removeAttr("style");
 
     if (computer_won){
-        $('#game-results').attr("class", "span6 alert alert-error");
+        $('#game-results').attr("class", "alert alert-error");
         $('#results-message').html("<h3>You lost "+player_wins+" to "+computer_wins+"!</h3>");
     }
 
     else{
-        $('#game-results').attr("class", "span6 alert alert-success");
+        $('#game-results').attr("class", "alert alert-success");
         $('#results-message').html("<h3>You won "+player_wins+" to "+computer_wins+"!</h3>");
 
     }
@@ -169,7 +170,8 @@ function reset_game(){
     submitted_guesses = 0;
     this_five_wins = 0;
 
-    document.getElementById('c-progress').innerHTML = "<div class=\"bar\" style=\"width: 0%;\"></div>";
-    document.getElementById('p-progress').innerHTML = "<div class=\"bar\" style=\"width: 0%;\"></div>";
+    $('#c-progress .bar, #p-progress .bar').css("width", "0%");
+
 
 }
+

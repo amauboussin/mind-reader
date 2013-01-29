@@ -1,4 +1,4 @@
-
+10100101
 from string import count
 from random import random
 
@@ -7,9 +7,11 @@ win_threshold = 50
 
 def main():
 	
-	print """Enter 0 or 1 repeatedly. The computer will try to guess what you will input next based off your previous responses.
-If you the computer guesses correctly, it gets a point. If if guesses incorrectly you get a point. First to %s wins.
-To maximize your chances of winning try to avoid falling into any patterns. 
+	print """
+Enter 0 and 1 using the keyboard. 
+The computer uses an algorithm tries to guess what you are going to input next. 
+If the computer guesses correctly, it gets a point. If it guesses incorrectly you get a point. 
+First to %s wins. Try to choose your inputs as randomly as possible so the computer can't tell what is coming next.  
 	""" % win_threshold
 	
 	computer_wins = 0
@@ -76,10 +78,8 @@ def get_prediction(history):
 
 #determines how many votes  a pattern of length n is worth
 def get_votes(n):
-	e = 2.71828
-	n = float(n)
-	power = -(  ((n-4.0)**2.0) / (2.0*2.0**2.0) )
-	return e**power
+	return -.4*((n-3)**2)+5;
+
 	
 # start get character recipe from http://code.activestate.com/recipes/577977-get-single-keypress/history/1/
 import sys
