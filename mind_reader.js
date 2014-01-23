@@ -17,7 +17,6 @@ var history = "";
 
 
 
-
 $("#reset-button").on("click", function(){
     reset_game()
 }) 
@@ -86,15 +85,20 @@ function submitGuess (guess){
             last_n = history.slice(history.length-n, history.length);
         }
 
-        //count occurences of each pattern
+        //count occurences of each pattern; do nothing in case of tie
         var zero = occurrences(history, last_n+"0", true);
         var one = occurrences(history, last_n+"1", true);
 
-        if (zero > one){votes_0+=zero/(zero+one)*get_votes(n);}
-        if (one>zero){votes_1+=one/(zero+one)*get_votes(n);}
-    }
-    var prediction;
+        if (zero > one){
+            votes_0+=zero/(zero+one)*get_votes(n);
+        }
+        if (one > zero){
+            votes_1+=one/(zero+one)*get_votes(n);
+        }
 
+    }
+
+    var prediction;
     //check votes and finalize prediction
     if (votes_0 > votes_1){
         prediction = 0;}
@@ -120,7 +124,7 @@ function submitGuess (guess){
     history += guess.toString(); //add to the history
 
 
-    // push to google analytics every 5 guesses
+    // push data to google analytics every 5 guesses
     if (submitted_guesses != 0 &&  submitted_guesses % 5 == 0)
     {
         _gaq.push(['_trackEvent', 'Mind Reader Results', 'Round '+round_n, (history.slice(-5)), this_five_wins]);
